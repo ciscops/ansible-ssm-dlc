@@ -6,8 +6,6 @@
     - register
   vars:
     smart_licensing:
-      boot_level: "{{ bootlevel }}"
-      #throughput_level: 2500
       idtoken: #idtoken
     satellite_ip: #satellite_ip
   tasks:
@@ -37,13 +35,6 @@
         commands:
           - command: test license smart conversion enable
           - command: license smart conversion start
-
-    - name: Set the license boot level
-      ios_config:
-        lines:
-          - "license boot level {{ smart_licensing.boot_level }}"
-          - "platform hardware throughput level MB {{ smart_licensing.throughput_level }}"
-        save_when: modified
 
     - name: Reloading the Switch
       ios_command:
