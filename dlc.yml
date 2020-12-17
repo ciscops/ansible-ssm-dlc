@@ -1,0 +1,74 @@
+- name: Configure licensing
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  tags:
+    - register
+  vars:
+    smart_licensing:
+      boot_level: "{{ bootlevel }}"
+      #throughput_level: 2500
+      idtoken: #idtoken
+    satellite_ip: #satellite_ip
+  tasks:
+    - name: disable default callhome URL
+      ios_config:
+        lines:
+          - "license smart enable"
+          - "call-home"
+          - "profile CiscoTAC-1"
+          - "destination address http http://{{ satellite_ip }}/Transportgateway/services/DeviceRequestHandler"
+          - "no destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService"
+        save_when: modified
+
+    - name: Register with idtoken
+      ios_command:
+        commands:
+          - command: license smart register idtoken {{ smart_licensing.idtoken }}
+
+    - name: enable service internal
+      ios_config:
+        lines:
+          - "service internal"
+        save_when: modified
+
+    - name: start conversion
+      ios_command:
+        commands:
+          - command: test license smart conversion enable
+          - command: license smart conversion start
+
+    - name: Set the license boot level
+      ios_config:
+        lines:
+          - "license boot level {{ smart_licensing.boot_level }}"
+          - "platform hardware throughput level MB {{ smart_licensing.throughput_level }}"
+        save_when: modified
+
+    - name: Reloading the Switch
+      ios_command:
+        commands:
+          - command: reload
+            prompt: [confirm]
+            answer: "\r"
+
+    - name: Reset the persitent SSH connection
+      meta: reset_connection
+
+    - name: Wait for device to come back up
+      wait_for:
+        port: 22
+        timeout: 1800
+        host: "{{ ansible_host }}"
+        delay: 300
+        retries: 5
+      delegate_to: localhost
+
+    - name: Waiting for successful registration
+      ios_command:
+        commands:
+          - show license status
+      register: license_status
+      until: "'AUTHORIZED' in license_status.stdout[0]"
+      retries: 60
+      delay: 10
