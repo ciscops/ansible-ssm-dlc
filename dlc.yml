@@ -8,8 +8,9 @@
     - register
   vars:
     smart_licensing:
-      idtoken: #idtoken
-    satellite_ip: #satellite_ip
+      idtoken: MzY3NDdmYWUtMjFmYy00ZDM3LTk0MGEtMzRjYWRjMDdjYmZlLTE2MTI5NzY0%0AODgyOTZ8WkJpVVgrZ2NLdlNSaGFIS1BhejJQQ3lZRzIyalNab0RMZmdRSnZO%0AR3pSWT0%3D%0A
+    satellite_ip: 10.81.106.236
+    satellite_user: admin
     satellite_password: #satellite_pw
   tasks:
     - name: disable default callhome URL
