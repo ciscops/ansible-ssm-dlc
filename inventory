@@ -4,5 +4,7 @@ CSR1 ansible_host=<your-host-ip>
 [servers:vars]
 ansible_password=<enter-password>
 ansible_sudo_pass=<enter-password>
+ansible_become_password=<enter-password>
 ansible_user=admin
 ansible_ssh_user=admin
+ansible_network_os=ios

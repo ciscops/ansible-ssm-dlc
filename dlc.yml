@@ -2,12 +2,15 @@
   hosts: all
   gather_facts: no
   connection: network_cli
+  become: yes
+  become_method: enable
   tags:
     - register
   vars:
     smart_licensing:
       idtoken: #idtoken
     satellite_ip: #satellite_ip
+    satellite_password: #satellite_pw
   tasks:
     - name: disable default callhome URL
       ios_config:
@@ -52,7 +55,6 @@
         timeout: 1800
         host: "{{ ansible_host }}"
         delay: 300
-        retries: 5
       delegate_to: localhost
 
     - name: Waiting for successful registration
@@ -63,3 +65,42 @@
       until: "'AUTHORIZED' in license_status.stdout[0]"
       retries: 60
       delay: 10
+
+    - name: Force full sync on OnPrem
+      uri:
+        url: 'https://{{ satellite_ip }}:8443/backend/sync/upstream_satellites/sync.json?satellite_id=1&sync_type=full'
+        method: PUT
+        body: '{"sync_account_id":1,"exclude_hostname":false,"exclude_ipaddress":false,"exclude_macaddress":false}'
+        body_format: json
+        headers:
+            Content-Type: 'text/plain'
+        url_username: '{{ satellite_user }}'
+        url_password: '{{ satellite_password }}'
+        validate_certs: no
+      register: result
+    
+    - name: Wait for full sync to complete
+      pause:
+        minutes: 7
+
+    - name: Force full sync on OnPrem
+      uri:
+        url: 'https://{{ satellite_ip }}:8443/backend/sync/upstream_satellites/sync.json?satellite_id=1&sync_type=full'
+        method: PUT
+        body: '{"sync_account_id":1,"exclude_hostname":false,"exclude_ipaddress":false,"exclude_macaddress":false}'
+        body_format: json
+        headers:
+            Content-Type: 'text/plain'
+        url_username: '{{ satellite_user }}'
+        url_password: '{{ satellite_password }}'
+        validate_certs: no
+      register: result
+
+    - name: Wait for full sync to complete
+      pause:
+        minutes: 2
+
+    - name: License renew auth
+      ios_command:
+        commands:
+          - command: license smart renew auth
