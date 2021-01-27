@@ -8,10 +8,8 @@
     - register
   vars:
     smart_licensing:
-      idtoken: MzY3NDdmYWUtMjFmYy00ZDM3LTk0MGEtMzRjYWRjMDdjYmZlLTE2MTI5NzY0%0AODgyOTZ8WkJpVVgrZ2NLdlNSaGFIS1BhejJQQ3lZRzIyalNab0RMZmdRSnZO%0AR3pSWT0%3D%0A
+      idtoken: "{{idtoken}}"
     satellite_ip: 10.81.106.236
-    satellite_user: admin
-    satellite_password: #satellite_pw
   tasks:
     - name: disable default callhome URL
       ios_config:
@@ -66,40 +64,6 @@
       until: "'AUTHORIZED' in license_status.stdout[0]"
       retries: 60
       delay: 10
-
-    - name: Force full sync on OnPrem
-      uri:
-        url: 'https://{{ satellite_ip }}:8443/backend/sync/upstream_satellites/sync.json?satellite_id=1&sync_type=full'
-        method: PUT
-        body: '{"sync_account_id":1,"exclude_hostname":false,"exclude_ipaddress":false,"exclude_macaddress":false}'
-        body_format: json
-        headers:
-            Content-Type: 'text/plain'
-        url_username: '{{ satellite_user }}'
-        url_password: '{{ satellite_password }}'
-        validate_certs: no
-      register: result
-    
-    - name: Wait for full sync to complete
-      pause:
-        minutes: 7
-
-    - name: Force full sync on OnPrem
-      uri:
-        url: 'https://{{ satellite_ip }}:8443/backend/sync/upstream_satellites/sync.json?satellite_id=1&sync_type=full'
-        method: PUT
-        body: '{"sync_account_id":1,"exclude_hostname":false,"exclude_ipaddress":false,"exclude_macaddress":false}'
-        body_format: json
-        headers:
-            Content-Type: 'text/plain'
-        url_username: '{{ satellite_user }}'
-        url_password: '{{ satellite_password }}'
-        validate_certs: no
-      register: result
-
-    - name: Wait for full sync to complete
-      pause:
-        minutes: 2
 
     - name: License renew auth
       ios_command:
