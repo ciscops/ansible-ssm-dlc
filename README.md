@@ -15,6 +15,6 @@ Prior to running the playbook, you will need to update the ```satellite_ip``` va
 ansible-playbook dlc.yml -e idtoken=<idtoken_from_ssm_onprem>
 ```
 ## Synchronize SSM OnPrem
-Once the device portion of the process is complete you will need to go in to the User Interface of your SSM OnPrem and initiate a full synchronization in the Admin Workspace.  Depending on your number of devices it can take up to 2 hours to process the changes at software.cisco.com.  Once the licenses are connverted, you can check progress in the "Conversion" section of the Virtual Account associated with the OnPrem, then do another full synchronization and your converstion will be complete.  
+Once the device portion of the process is complete you will need to go in to the User Interface of your SSM OnPrem and initiate a full synchronization in the Admin Workspace.  Depending on your number of devices it can take up to 2 hours to process the changes at software.cisco.com.  Once the licenses are converted, you can check progress in the "Conversion" section of the Virtual Account associated with the OnPrem, then do another full synchronization and your conversion will be complete.  
 
 You can find the latest SSM OnPrem User Guide here:  https://software.cisco.com/download/home/286285506/type/286326948
